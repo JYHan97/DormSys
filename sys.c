@@ -1,6 +1,13 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+
+/*
+TODO: 判断是否有人入住
+TODO: 数据校验
+TODO: 统计空床数
+*/
 
 // 学生结构体
 typedef struct student
@@ -32,12 +39,33 @@ void deleteBypos(NODE *head);
 void xiugai(NODE *head);
 void showMenu();
 void SUSHE(NODE *head);
+bool isValidDate(int yr, int mo, int d)
+{
+	// 月份与日期对应关系，month[0] = 1月 = 31天
+	int month[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	// 闰年判断
+	if (yr % 400 == 0 || (yr % 4 == 0 && yr % 100 != 0))
+	{
+		month[1] = 29;
+	}
+
+	if (mo > 0 && mo <= 12 && d > 0 && d <= month[mo - 1])
+	{
+		return true;
+	}
+	else
+	{
+		printf("输入的日期不合法，请重新输入");
+		return false;
+	}
+}
 
 /*用尾插法的思想，建立学生宿舍信息的单链表*/
 NODE *create() /*建立单链表的函数 (尾插法的思路)*/
 {
 	NODE *head, *s, *p, *tail;
-	int count, i;												 /*这个变量用来记录原始学生的人数*/
+	int count, i; /*这个变量用来记录原始学生的人数*/
+	char tempInput[20];
 	head = (NODE *)malloc(sizeof(NODE)); /*建立头结点 */
 	head->next = NULL;
 	printf("请输入学生的人数:");
@@ -47,21 +75,32 @@ NODE *create() /*建立单链表的函数 (尾插法的思路)*/
 		/*申请空间*/
 		p = (NODE *)malloc(sizeof(NODE));
 		p->next = NULL;
+
 		printf("请输入第%d个学生的信息:\n", i);
-		printf("学号:");
+		printf("学号[xxx]:");
 		fflush(stdin);
 		gets(p->data.stu_no);
+
 		printf("姓名:");
 		fflush(stdin);
 		gets(p->data.stu_name);
-		printf("床位号:");
+
+		printf("床位号[xx]:");
 		scanf("%d", &p->data.bed);
-		printf("宿舍号；");
+
+		printf("宿舍号[xx]:");
 		scanf("%d", &p->data.room);
-		printf("班级；");
+
+		printf("班级[xx]");
 		scanf("%d", &p->data.class);
-		printf("入住时间【xx年】:");
-		scanf("%s", &p->data.time);
+
+		int yr, mo, d;
+		do
+		{
+			printf("入住时间[xxxx/xx/xx]:");
+			scanf("%4d/%2d/%2d", &yr, &mo, &d);
+		} while (!isValidDate(yr, mo, d));
+		sprintf(p->data.time, "%d/%d/%d", yr, mo, d);
 
 		if (i == 1) /*第一个节点的挂链处理 */
 		{
